@@ -1,8 +1,8 @@
 package `fun`.inaction.transfer
 
+import `fun`.inaction.transfer.utils.sendFile
 import android.util.Log
 import inaction.`fun`.network.SocketUtil
-import java.util.*
 import kotlin.concurrent.thread
 
 class SendLooper {

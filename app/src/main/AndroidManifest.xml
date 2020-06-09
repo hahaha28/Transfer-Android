@@ -11,9 +11,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".SendMsgActivity"
-            android:windowSoftInputMode="stateAlwaysVisible"/>
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+        <activity android:name=".AboutSAFActivity"></activity>
+        <activity
+            android:name=".SendMsgActivity"
+            android:windowSoftInputMode="stateAlwaysVisible" />
         <activity android:name=".PickFileActivity" />
         <activity android:name=".MainActivity">
             <intent-filter>

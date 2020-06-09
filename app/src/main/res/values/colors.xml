@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">#2962ff</color>
+    <color name="colorPrimaryDark">#2962ff</color>
+    <color name="colorAccent">#2962ff</color>
+
+    <color name="colorActionBarTitle">#fff</color>
 
     <color name="gray_button_background">#F5F5F5</color>
     <color name="gray_button_selected">#E3E3E3</color>
+
+    <color name="connected_color">#2962ff</color>
+    <color name="disconnect_color">#B2B2B2</color>
+    <color name="connecting_color">#B2B2B2</color>
+
+    <!-- FloatActionButton 的颜色 -->
+    <color name="fab_color">#2962ff</color>
 
 </resources>

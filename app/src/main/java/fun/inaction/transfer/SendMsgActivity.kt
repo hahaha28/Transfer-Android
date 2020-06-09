@@ -16,6 +16,9 @@ class SendMsgActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySendMsgBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        // 设置标题
+        supportActionBar?.title = "发送消息"
+
         msgText.requestFocus()
     }
 

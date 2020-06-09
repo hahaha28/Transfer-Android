@@ -1,5 +1,6 @@
-package `fun`.inaction.transfer
+package `fun`.inaction.transfer.utils
 
+import `fun`.inaction.transfer.MyApplication
 import android.content.ContentResolver
 import android.net.Uri
 import android.provider.OpenableColumns
@@ -16,7 +17,7 @@ fun SocketUtil.sendFile(uri: Uri,contentResolver:ContentResolver){
         cursor.moveToFirst()
         val name = cursor.getString(nameIndex)
         val size = cursor.getLong(sizeIndex)
-        val type = `fun`.inaction.transfer.getFileType(name)
+        val type = getFileType(name)
         sendFile(name,type,size,contentResolver.openInputStream(uri))
     }
 
@@ -28,7 +29,8 @@ fun SocketUtil.sendFile(uriString:String,contentResolver: ContentResolver){
 }
 
 fun SocketUtil.sendFile(uriString:String){
-    sendFile(uriString,MyApplication.getContext().contentResolver)
+    sendFile(uriString,
+        MyApplication.getContext().contentResolver)
 }
 
 /**

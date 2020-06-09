@@ -27,14 +27,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/textView2"
         android:layout_width="100dp"
         android:layout_height="50dp"
-        android:background="@drawable/mi_button"
         android:gravity="center"
         android:onClick="onClickSend"
         android:text="发送"
+        app:cornerRadius="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
