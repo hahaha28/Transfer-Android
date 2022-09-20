@@ -2,7 +2,6 @@ package `fun`.inaction.transfer.utils
 
 import `fun`.inaction.transfer.MyApplication
 import android.os.Build
-import kotlin.Exception
 
 /**
  * 获取资源的颜色

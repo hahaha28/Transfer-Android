@@ -97,16 +97,25 @@ class PickFileActivity : AppCompatActivity() {
                 data?.clipData?.let { clip ->
                     val uriList = mutableListOf<Uri>()
                     for(i in 0 until clip.itemCount){
-                        uriList.add(clip.getItemAt(i).uri)
+                        val uri = clip.getItemAt(i).uri
+                        requestPermission(uri)
+                        uriList.add(uri)
                     }
                     postNewFiles(uriList)
                 }
                 data?.data?.let { uri ->
+                    requestPermission(uri)
                     postNewFile(uri)
                 }
             }
         }
 
+    }
+
+    private fun requestPermission(uri:Uri) {
+        val takeFlags: Int = Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+        contentResolver.takePersistableUriPermission(uri, takeFlags)
     }
 
     /**

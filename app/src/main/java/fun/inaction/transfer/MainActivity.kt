@@ -1,16 +1,19 @@
 package `fun`.inaction.transfer
 
 import `fun`.inaction.dialog.dialogs.CommonDialog
+import `fun`.inaction.transfer.bean.FileTransferItem
+import `fun`.inaction.transfer.bean.MsgTransferItem
 import `fun`.inaction.transfer.databinding.ActivityMainBinding
 import `fun`.inaction.transfer.events.NewFilesEvent
 import `fun`.inaction.transfer.events.NewMsgEvent
-import `fun`.inaction.transfer.utils.LogUtil
-import `fun`.inaction.transfer.utils.getInfo
-import `fun`.inaction.transfer.utils.getResourceColor
+import `fun`.inaction.transfer.utils.*
+import android.Manifest
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import com.permissionx.guolindev.PermissionX
+import com.permissionx.guolindev.callback.RequestCallback
 import inaction.`fun`.data.transfer.TransferImpl
 import inaction.`fun`.network.Client
 import inaction.`fun`.network.SocketUtil
@@ -26,15 +29,6 @@ import kotlin.concurrent.thread
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private var client: Client? = null
-    private var socketUtil: SocketUtil? = null
-    private var sendLooper: SendLooper? = null
-
-    /**
-     * 传输队列
-     */
-    private val transferQueue = TBlockQueue()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +47,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
         setConnectText(ConnectStatus.DISCONNECT)
+
+        PermissionX.init(this)
+            .permissions(Manifest.permission.READ_EXTERNAL_STORAGE)
+            .request(null)
 
     }
 
@@ -91,35 +89,18 @@ class MainActivity : AppCompatActivity() {
             return
         }
         ipTextLayout.error = null
-        //
-        thread{
-            if(socketUtil == null || socketUtil!!.isClosed) {
-                try {
-                    LogUtil.i("开始连接")
-                    client = Client(ip, 8888)
-                    socketUtil = SocketUtil(client?.connect(3000), TransferImpl::class.java)
-                    sendLooper = SendLooper(transferQueue, socketUtil!!)
-                    sendLooper?.loop()
-                    // 连接成功，显示信息
-                    runOnUiThread {
-                        setConnectText(ConnectStatus.CONNECTED)
-                        LogUtil.i("连接至 $ip 成功")
-                    }
-                }catch (e:Exception){
-                    // 连接失败
-                    runOnUiThread {
-                        setConnectText(ConnectStatus.DISCONNECT)
-                        connectSwitch.isChecked = false
-                        showConnectFailDialog()
-                        LogUtil.i("连接至 $ip 失败")
-                    }
-                    LogUtil.e(e.getInfo())
-                }
-            }else{
-                runOnUiThread {
-                    setConnectText(ConnectStatus.DISCONNECT)
-                    connectSwitch.isChecked = false
-                }
+
+        // 开始连接
+        TClient.connect(ip)
+        TClient.testHttpConnect { success ->
+            if (success) {
+                setConnectText(ConnectStatus.CONNECTED)
+                LogUtil.i("连接至 $ip 成功")
+            } else {
+                setConnectText(ConnectStatus.DISCONNECT)
+                connectSwitch.isChecked = false
+                showConnectFailDialog()
+                LogUtil.i("连接至 $ip 失败")
             }
         }
 
@@ -129,18 +110,9 @@ class MainActivity : AppCompatActivity() {
      * 取消连接
      */
     fun disConnect(){
-        socketUtil?.isClosed?.let {isClose->
-            if(!isClose){
-                socketUtil?.close()
-            }
-        }
+        TClient.disConnect()
         // 显示连接信息
         setConnectText(ConnectStatus.DISCONNECT)
-    }
-
-    override fun onResume() {
-        super.onResume()
-
     }
 
     /**
@@ -228,19 +200,16 @@ class MainActivity : AppCompatActivity() {
 
     @Subscribe(threadMode = ThreadMode.ASYNC)
     fun onNewFilesEvent(event: NewFilesEvent){
-        val blockList = LinkedList<TBlock>()
+
         event.uriList.forEach { uri->
-            blockList.add(TBlock(TBlock.TYPE_FILE,uri.toString()))
+            TClient.send(FileTransferItem(uri))
         }
-        transferQueue.addBlocks(blockList)
-        sendLooper?.loop()
+
     }
 
     @Subscribe
     fun onNewMsgEvent(event:NewMsgEvent){
-        val block = TBlock(TBlock.TYPE_MSG,event.msg)
-        transferQueue.add(block)
-        sendLooper?.loop()
+        TClient.send(MsgTransferItem(event.msg))
     }
 
 
